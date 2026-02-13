@@ -41,6 +41,5 @@ gradio>=5.0
 fastapi>=0.110
 uvicorn>=0.23
 
-# Project-specific / git deps
-#git+https://github.com/ultralytics/CLIP.git
-#git+https://github.com/facebookresearch/segment-anything-2.git
+# for in-the-wild
+ultralytics
