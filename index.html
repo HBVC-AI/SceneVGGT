@@ -1,0 +1,336 @@
+<!doctype html>
+<html lang="hu">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>SceneVGGT — VGGT-based online 3D semantic SLAM</title>
+  <meta name="description" content="SceneVGGT: VGGT-based online 3D semantic SLAM for indoor scene understanding and navigation." />
+  <style>
+    :root{
+      --bg:#0b0f19; --card:#0f1629; --text:#e7ecff; --muted:#a9b3d6;
+      --border:rgba(255,255,255,.10); --accent:#7aa2ff; --accent2:#67e8f9;
+      --code:#0a1224;
+      --shadow: 0 12px 30px rgba(0,0,0,.35);
+      --radius:18px;
+      color-scheme: dark;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+      background: radial-gradient(1200px 600px at 10% 0%, rgba(122,162,255,.18), transparent 60%),
+                  radial-gradient(900px 500px at 90% 10%, rgba(103,232,249,.16), transparent 55%),
+                  var(--bg);
+      color:var(--text);
+      line-height:1.55;
+    }
+    a{color:var(--accent); text-decoration:none}
+    a:hover{text-decoration:underline}
+
+    /* a teljes oldal “konténer” – ez limitálja az egész lap szélességét */
+    .wrap{max-width:980px; margin:0 auto; padding:40px 18px 64px}
+
+    header{
+      text-align:center;
+      padding:30px 18px 10px;
+    }
+    .badge{
+      display:inline-flex; gap:8px; align-items:center;
+      padding:7px 12px;
+      border:1px solid var(--border);
+      border-radius:999px;
+      background: rgba(255,255,255,.03);
+      color:var(--muted);
+      font-size:13px;
+    }
+    h1{
+      margin:16px 0 10px;
+      font-size: clamp(26px, 3.6vw, 40px);
+      line-height:1.15;
+      letter-spacing:-.02em;
+    }
+    .subtitle{
+      max-width:820px;
+      margin: 0 auto 18px;
+      color:var(--muted);
+      font-size: 16px;
+    }
+    .btns{display:flex; justify-content:center; gap:10px; flex-wrap:wrap; margin:18px 0 10px}
+    .btn{
+      display:inline-flex; align-items:center; gap:8px;
+      padding:10px 14px;
+      border-radius:12px;
+      border:1px solid var(--border);
+      background: rgba(255,255,255,.04);
+      color:var(--text);
+      transition: transform .08s ease, background .15s ease, border-color .15s ease;
+      font-weight:600;
+      font-size:14px;
+    }
+    .btn:hover{background: rgba(255,255,255,.07); border-color: rgba(255,255,255,.16); text-decoration:none}
+    .btn:active{transform: translateY(1px)}
+    .btn.primary{
+      background: linear-gradient(135deg, rgba(122,162,255,.22), rgba(103,232,249,.14));
+      border-color: rgba(122,162,255,.35);
+    }
+    .authors{
+      margin:14px auto 8px;
+      color:var(--muted);
+      font-size:15px;
+    }
+    .authors b{color:var(--text); font-weight:700}
+    .notes{
+      margin:8px auto 0;
+      color:var(--muted);
+      font-size:13px;
+    }
+
+    .grid{
+      display:grid;
+      grid-template-columns: 1fr;
+      gap:16px;
+      margin-top:22px;
+    }
+    @media (min-width: 860px){
+      .grid{grid-template-columns: 1.15fr .85fr;}
+    }
+
+    /* ez a trükk: elem átnyúlhat mindkét oszlopon */
+    .span-all{
+      grid-column: 1 / -1;
+    }
+
+    section.card, aside.card{
+      background: rgba(255,255,255,.03);
+      border:1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding:18px 18px 16px;
+    }
+    section.card h2, aside.card h2{
+      margin:0 0 10px;
+      font-size:18px;
+      letter-spacing:-.01em;
+    }
+    p{margin:0 0 12px}
+    ul{margin:0 0 12px; padding-left:18px; color:var(--muted)}
+    li{margin:6px 0}
+    .muted{color:var(--muted)}
+
+    /* FULL-WIDTH GIF blokk (a grid teljes szélességén) */
+    .media{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap:16px;
+      width:100%;
+      margin-top:12px;
+    }
+    @media (max-width: 560px){
+      .media{grid-template-columns:1fr}
+    }
+    figure{
+      margin:0;
+      border-radius:16px;
+      overflow:hidden;
+      border:1px solid var(--border);
+      background: rgba(0,0,0,.18);
+    }
+    figure img{
+      width:100%;
+      height:auto;
+      display:block;
+      /* ne vágjon le semmit */
+      object-fit: contain;
+    }
+    figcaption{
+      padding:10px 12px;
+      color:var(--muted);
+      font-size:13px;
+      border-top:1px solid var(--border);
+    }
+
+    pre{
+      margin:12px 0 0;
+      padding:14px 14px;
+      background: rgba(10,18,36,.72);
+      border:1px solid rgba(255,255,255,.09);
+      border-radius: 14px;
+      overflow:auto;
+      font-size:13px;
+      line-height:1.45;
+    }
+    code{font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;}
+    .kpi{
+      display:flex; gap:12px; flex-wrap:wrap; margin-top:10px;
+    }
+    .pill{
+      display:inline-flex; flex-direction:column; gap:2px;
+      padding:10px 12px;
+      border-radius:14px;
+      border:1px solid var(--border);
+      background: rgba(255,255,255,.03);
+      min-width: 160px;
+    }
+    .pill .t{color:var(--muted); font-size:12px}
+    .pill .v{font-weight:800; font-size:15px}
+    footer{
+      margin-top:22px;
+      text-align:center;
+      color:var(--muted);
+      font-size:13px;
+    }
+    .hr{height:1px; background:var(--border); margin:12px 0}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="badge" title="Project landing page">
+        <span>🧭</span>
+        <span>SceneVGGT</span>
+        <span class="muted">•</span>
+        <span class="muted">Online 3D semantic SLAM</span>
+      </div>
+
+      <h1>SceneVGGT: VGGT-based online 3D semantic SLAM for indoor scene understanding and navigation</h1>
+
+      <p class="subtitle">
+        <b>SceneVGGT</b> is a spatio-temporal 3D scene understanding framework that combines SLAM with semantic mapping for autonomous and assistive navigation.
+        It supports online, real-time processing of streamed data (e.g., from an iPhone Pro). The pipeline’s GPU memory usage remains under 17 GB, irrespective
+        of sequence length, and achieves competitive point-cloud performance on the ScanNet++ benchmark. Overall, SceneVGGT ensures robust semantic
+        identification and is fast enough to support interactive assistive navigation with audio feedback.
+      </p>
+
+      <div class="btns">
+        <a class="btn primary" href="https://arxiv.org/user/" target="_blank" rel="noreferrer">📄 Paper (arXiv)</a>
+         <a class="btn" href="https://github.com/HBVC-AI/SceneVGGT/" target="_blank" rel="noreferrer">💻 Code (GitHub)</a>
+  	<a class="btn" href="#installation">⚙️ Installation</a>
+        <a class="btn" href="#citation">✍️ Citation</a>
+      </div>
+
+      <div class="authors">
+        Anna Gelencsér-Horváth<sup>*</sup><sup>†</sup> ·
+        Gergely Dinya<sup>*</sup> ·
+        Péter Halász ·
+        Dorka Erős ·
+        Islam Muhammad Muqsit ·
+        Kristóf Karacs
+      </div>
+
+      <div class="notes">
+        <span><sup>*</sup> Equal contribution.</span>
+        &nbsp;&nbsp;
+        <span><sup>†</sup> Corresponding author.</span>
+      </div>
+    </header>
+
+    <div class="grid">
+      <!-- Bal oldali (szöveg + KPI) -->
+      <section class="card">
+        <h2>Overview</h2>
+        <p class="muted">
+          SceneVGGT enables temporally coherent 3D semantic mapping by lifting 2D instance masks into 3D and tracking instances with the VGGT tracking head.
+          Persistent object identities + timestamps provide computationally efficient, temporally consistent change detection, while floor-plane projection of object
+          locations supports downstream assistive navigation—including a proof-of-concept navigation module.
+        </p>
+
+        <div class="kpi">
+          <div class="pill">
+            <div class="t">Processing</div>
+            <div class="v">Online / real-time</div>
+          </div>
+          <div class="pill">
+            <div class="t">Input</div>
+            <div class="v">Streamed data (e.g., iPhone Pro)</div>
+          </div>
+          <div class="pill">
+            <div class="t">GPU memory</div>
+            <div class="v">&lt; 17 GB (sequence-length invariant)</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Jobb oldali (news + download) -->
+      <aside class="card">
+        <h2>News</h2>
+        <ul>
+          <li><b>[2025/2/12]</b> Code release.</li>
+          <!-- <li><b>[2026/2/13]</b> Paper released on arXiv.</li> -->
+        </ul>
+
+        <div class="hr"></div>
+
+        <h2>Download checkpoints</h2>
+        <p class="muted" style="margin-bottom:10px">
+          Please download VGG-T model checkpoint from Hugging Face:
+        </p>
+        <a class="btn" href="https://huggingface.co/facebook/VGGT-1B/blob/main/model.pt" target="_blank" rel="noreferrer">
+          ⬇️ VGGT-1B model.pt
+        </a>
+
+        <div class="hr"></div>
+
+        <h2>Evaluation</h2>
+        <p class="muted">Coming soon.</p>
+      </aside>
+
+      <!-- Itt a lényeg: FULL szélesség a két oszlopon -->
+      <section class="card span-all">
+        <h2>3D semantic SLAM and navigation from Streaming Inputs</h2>
+        <div class="media">
+          <figure>
+            <img src="assets/lab.gif" alt="3D semantic SLAM demo (lab.gif)" />
+            <figcaption>3D semantic SLAM and navigation from streaming inputs</figcaption>
+          </figure>
+          <figure>
+            <img src="assets/change.gif" alt="Change detection demo (change.gif)" />
+            <figcaption>Temporally consistent change detection</figcaption>
+          </figure>
+        </div>
+      </section>
+    </div>
+
+    <section id="installation" class="card" style="margin-top:16px">
+      <h2>Installation</h2>
+      <ol class="muted" style="margin:0 0 12px; padding-left:18px">
+        <li style="margin:8px 0">Clone SceneVGGT</li>
+      </ol>
+      <pre><code>git clone git@github.com:HBVC-AI/SceneVGGT.git
+cd SceneGGT</code></pre>
+
+      <ol start="2" class="muted" style="margin:12px 0 12px; padding-left:18px">
+        <li style="margin:8px 0">Create conda environment</li>
+      </ol>
+      <pre><code>conda create -n scenevggt python=3.10
+conda activate SceneVGGT</code></pre>
+
+      <ol start="3" class="muted" style="margin:12px 0 12px; padding-left:18px">
+        <li style="margin:8px 0">Install requirements</li>
+      </ol>
+      <pre><code>pip install -r requirements.txt</code></pre>
+    </section>
+
+    <section id="citation" class="card" style="margin-top:16px">
+      <h2>Citation</h2>
+      <p class="muted">If you find this project helpful, please cite the following paper:</p>
+      <pre><code>@article{scenevggt,
+      title={SceneVGGT: VGGT-based Online 3D Semantic SLAM for Indoor Scene Understanding and Navigation},
+      author={Anna Gelencsér-Horváth, Gergely Dinya, Dorka Boglárka Erős, Péter Halász, Islam Muhammad Muqsit, Kristóf Karacs},
+      journal={arXiv preprint }
+      year={2026}
+}</code></pre>
+    </section>
+
+    <footer>
+      <div class="muted">
+        © <span id="y"></span> • SceneVGGT • HBVC-AI 
+      </div>
+    </footer>
+  </div>
+
+  <script>
+    document.getElementById("y").textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
+
