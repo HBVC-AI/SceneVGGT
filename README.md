@@ -29,7 +29,7 @@ ScanNet++ benchmark. Overall, SceneVGGT ensures robust semantic identification a
 
 ## News
 
-<!-- - **[2026/2/13]** Paper released on [arXiv](https://arxiv.org/abs/   ). -->
+- **[2026/2/13]** Paper released on [arXiv](https://arxiv.org/abs/2602.15899).
 - **[2025/2/12]** Code release.
 
 ## Overview
@@ -72,10 +72,13 @@ Coming soon.
 
 If you find this project helpful, please consider citing the following paper:
 ```
-@article{scenevggt,
-      title={SceneVGGT: VGGT-based Online 3D Semantic SLAM for Indoor Scene Understanding and Navigation}, 
-      author={Anna Gelencsér-Horváth, Gergely Dinya, Dorka Boglárka Erős, Péter Halász, Islam Muhammad Muqsit, Kristóf Karacs},
-      journal={arXiv preprint } 
-      year={2026}
+@misc{scenevggt,
+      title={SceneVGGT: VGGT-based online 3D semantic SLAM for indoor scene understanding and navigation}, 
+      author={Anna Gelencsér-Horváth and Gergely Dinya and Dorka Boglárka Erős and Péter Halász and Islam Muhammad Muqsit and Kristóf Karacs},
+      year={2026},
+      eprint={2602.15899},
+      archivePrefix={arXiv},
+      primaryClass={cs.RO},
+      url={https://arxiv.org/abs/2602.15899}, 
 }
 ```
