@@ -30,7 +30,7 @@ ScanNet++ benchmark. Overall, SceneVGGT ensures robust semantic identification a
 ## News
 
 - **[2026/2/13]** Paper released on [arXiv](https://arxiv.org/abs/2602.15899).
-- **[2025/2/12]** Code release.
+- **[2026/2/12]** Code release.
 
 ## Overview
 
