@@ -28,7 +28,7 @@ The pipeline’s GPU memory usage remains under 17 GB, irrespectively of the len
 ScanNet++ benchmark. Overall, SceneVGGT ensures robust semantic identification and is fast enough to support interactive assistive navigation with audio feedback.
 
 ## News
-
+- **[2026/4/30] Paper accepted for the IEEE ICIP 2026 conference.**
 - **[2026/2/13]** Paper released on [arXiv](https://arxiv.org/abs/2602.15899).
 - **[2026/2/12]** Code release.
 
